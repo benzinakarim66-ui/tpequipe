@@ -62,6 +62,7 @@
         <h1>Bienvenue</h1>
         <a href="/equipes">Voir les equipes</a>
         <a href="/joueurs">Voir les joueurs</a>
+        <a href="/statistics" style="background-color: #2196F3;">Voir les statistiques</a>
     </div>
 </body>
 </html>
