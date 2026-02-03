@@ -8,152 +8,122 @@ use Illuminate\Http\Request;
 
 class StatisticController extends Controller
 {
-    // Page principale - Menu des statistiques
     public function index()
     {
-        return view('statistics.index');
+        return view('statistic');
     }
 
-    // Statistiques générales
-    public function general()
+    public function joueursEquipe($id)
     {
-        $totalEquipes = Equipe::count();
-        $totalJoueurs = Joueur::count();
-        $totalButs = Joueur::sum('nombre_but');
-        $totalCartesJaunes = Joueur::sum('carte_jaune');
-        $totalCartesRouges = Joueur::sum('carte_rouge');
-        $moyenneAge = Joueur::avg('age');
-
-        return view('statistics.general', compact(
-            'totalEquipes',
-            'totalJoueurs',
-            'totalButs',
-            'totalCartesJaunes',
-            'totalCartesRouges',
-            'moyenneAge'
-        ));
+        $equipe = Equipe::with('joueurs')->find($id);
+        $joueurs = $equipe->joueurs;
+        return view('statistic', compact('joueurs', 'equipe'));
     }
 
-    // Top Buteurs
-    public function topButeurs()
+    public function equipeJoueur($id)
     {
-        $meilleurButeur = Joueur::with('equipe')
-            ->orderBy('nombre_but', 'desc')
-            ->first();
-
-        $topButeurs = Joueur::with('equipe')
-            ->orderBy('nombre_but', 'desc')
-            ->take(10)
-            ->get();
-
-        return view('statistics.top-buteurs', compact('meilleurButeur', 'topButeurs'));
+        $joueur = Joueur::with('equipe')->find($id);
+        $nomEquipe = $joueur->equipe->nom;
+        return view('statistic', compact('joueur', 'nomEquipe'));
     }
 
-    // Statistiques des cartes
-    public function cartes()
+    public function joueursPlusDe5Buts()
     {
-        $topCartesJaunes = Joueur::with('equipe')
-            ->orderBy('carte_jaune', 'desc')
-            ->take(10)
-            ->get();
-
-        $topCartesRouges = Joueur::with('equipe')
-            ->orderBy('carte_rouge', 'desc')
-            ->take(10)
-            ->get();
-
-        return view('statistics.cartes', compact('topCartesJaunes', 'topCartesRouges'));
+        $joueurs = Joueur::where('nombre_but', '>', 5)->get();
+        return view('statistic', compact('joueurs'));
     }
 
-    // Statistiques par équipe
-    public function parEquipe()
+    public function joueursCartesRouges()
     {
-        $statsParEquipe = Equipe::withCount('joueurs')
-            ->withSum('joueurs', 'nombre_but')
-            ->withSum('joueurs', 'carte_jaune')
-            ->withSum('joueurs', 'carte_rouge')
-            ->get();
-
-        $equipePlusButs = Equipe::withSum('joueurs', 'nombre_but')
-            ->orderBy('joueurs_sum_nombre_but', 'desc')
-            ->first();
-
-        return view('statistics.par-equipe', compact('statsParEquipe', 'equipePlusButs'));
+        $joueurs = Joueur::where('carte_rouge', '>', 0)->get();
+        return view('statistic', compact('joueurs'));
     }
 
-    // Répartition par poste
-    public function parPoste()
+    public function joueursParPoste($poste)
     {
-        $repartitionPostes = Joueur::selectRaw('poste, count(*) as total, sum(nombre_but) as total_buts')
-            ->groupBy('poste')
-            ->get();
-
-        return view('statistics.par-poste', compact('repartitionPostes'));
+        $joueurs = Joueur::where('poste', $poste)->get();
+        return view('statistic', compact('joueurs'));
     }
 
-    // Joueurs filtrés (plus de 5 buts, cartes rouges, par âge)
-    public function joueursFiltres()
+    public function joueurs20a30()
     {
-        // Joueurs ayant plus de 5 buts
-        $joueursPlusDe5Buts = Joueur::with('equipe')
-            ->where('nombre_but', '>', 5)
-            ->get();
-
-        // Joueurs ayant au moins 1 carte rouge
-        $joueursCartesRouges = Joueur::with('equipe')
-            ->where('carte_rouge', '>', 0)
-            ->get();
-
-        // Joueurs entre 20 et 30 ans
-        $joueurs20a30 = Joueur::with('equipe')
-            ->whereBetween('age', [20, 30])
-            ->get();
-
-        // Joueurs 20-30 ans avec plus de 10 buts
-        $joueurs20a30PlusDe10Buts = Joueur::with('equipe')
-            ->whereBetween('age', [20, 30])
-            ->where('nombre_but', '>', 10)
-            ->get();
-
-        // Joueurs attaquants OU milieux
-        $attaquantsOuMilieux = Joueur::with('equipe')
-            ->where('poste', 'Attaquant')
-            ->orWhere('poste', 'Milieu')
-            ->get();
-
-        return view('statistics.joueurs-filtres', compact(
-            'joueursPlusDe5Buts',
-            'joueursCartesRouges',
-            'joueurs20a30',
-            'joueurs20a30PlusDe10Buts',
-            'attaquantsOuMilieux'
-        ));
+        $joueurs = Joueur::whereBetween('age', [20, 30])->get();
+        return view('statistic', compact('joueurs'));
     }
 
-    // Équipes filtrées
-    public function equipesFiltres()
+    public function joueurs20a30PlusDe10Buts()
     {
-        // Équipes ayant au moins un joueur
-        $equipesAvecJoueurs = Equipe::has('joueurs')->get();
+        $joueurs = Joueur::whereBetween('age', [20, 30])->where('nombre_but', '>', 10)->get();
+        return view('statistic', compact('joueurs'));
+    }
 
-        // Équipes ayant plus de 5 joueurs
-        $equipesPlusDe5Joueurs = Equipe::has('joueurs', '>', 5)->get();
+    public function joueursAttaquantsOuMilieux()
+    {
+        $joueurs = Joueur::where('poste', 'Attaquant')->orWhere('poste', 'Milieu')->get();
+        return view('statistic', compact('joueurs'));
+    }
 
-        // Équipes avec joueurs de moins de 20 ans
-        $equipesJoueursMoinsDe20 = Equipe::whereHas('joueurs', function ($query) {
+    public function joueursTriesParButs()
+    {
+        $joueurs = Joueur::orderByDesc('nombre_but')->get();
+        return view('statistic', compact('joueurs'));
+    }
+
+    public function top5Buteurs()
+    {
+        $joueurs = Joueur::orderByDesc('nombre_but')->take(5)->get();
+        return view('statistic', compact('joueurs'));
+    }
+
+    public function equipesAvecJoueurs()
+    {
+        $equipes = Equipe::has('joueurs')->get();
+        return view('statistic', compact('equipes'));
+    }
+
+    public function equipesPlusDe5Joueurs()
+    {
+        $equipes = Equipe::has('joueurs', '>', 5)->get();
+        return view('statistic', compact('equipes'));
+    }
+
+    public function equipesJoueursMoinsDe20()
+    {
+        $equipes = Equipe::whereHas('joueurs', function ($query) {
             $query->where('age', '<', 20);
         })->get();
+        return view('statistic', compact('equipes'));
+    }
 
-        // Top 3 buteurs par équipe
-        $equipesTop3Buteurs = Equipe::with(['joueurs' => function ($q) {
+    public function totalButsParEquipe()
+    {
+        $equipes = Equipe::withSum('joueurs', 'nombre_but')->get();
+        return view('statistic', compact('equipes'));
+    }
+
+    public function equipesTriesParButs()
+    {
+        $equipes = Equipe::withSum('joueurs', 'nombre_but')->orderByDesc('joueurs_sum_nombre_but')->get();
+        return view('statistic', compact('equipes'));
+    }
+
+    public function moyenneAge()
+    {
+        $avgAge = Joueur::avg('age');
+        return view('statistic', compact('avgAge'));
+    }
+
+    public function topJoueur()
+    {
+        $topJoueur = Joueur::orderByDesc('nombre_but')->first();
+        return view('statistic', compact('topJoueur'));
+    }
+
+    public function top3ButeursParEquipe()
+    {
+        $equipes = Equipe::with(['joueurs' => function ($q) {
             $q->orderByDesc('nombre_but')->take(3);
         }])->get();
-
-        return view('statistics.equipes-filtres', compact(
-            'equipesAvecJoueurs',
-            'equipesPlusDe5Joueurs',
-            'equipesJoueursMoinsDe20',
-            'equipesTop3Buteurs'
-        ));
+        return view('statistic', compact('equipes'));
     }
 }

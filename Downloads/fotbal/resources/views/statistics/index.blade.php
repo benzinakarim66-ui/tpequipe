@@ -3,135 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statistiques - Menu</title>
+    <title>Statistiques</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .stat-card {
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-            height: 200px;
-        }
-        .stat-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-        }
-        .stat-icon {
-            font-size: 4rem;
-            margin-bottom: 15px;
-        }
-    </style>
 </head>
 <body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <nav class="navbar navbar-dark bg-primary mb-4">
         <div class="container">
-            <a class="navbar-brand" href="/"><i class="fas fa-futbol"></i> Football Manager</a>
-            <div class="navbar-nav">
-                <a class="nav-link" href="{{ route('equipes.index') }}">Équipes</a>
-                <a class="nav-link" href="{{ route('joueurs.index') }}">Joueurs</a>
-                <a class="nav-link active" href="{{ route('statistics.index') }}">Statistiques</a>
+            <a class="navbar-brand" href="/">Football Manager</a>
+            <div class="navbar-nav flex-row">
+                <a class="nav-link text-white me-3" href="{{ route('equipes.index') }}">Équipes</a>
+                <a class="nav-link text-white" href="{{ route('joueurs.index') }}">Joueurs</a>
             </div>
         </div>
     </nav>
 
     <div class="container">
-        <h1 class="mb-4 text-center"><i class="fas fa-chart-bar"></i> Statistiques</h1>
-        <p class="text-center text-muted mb-5">Choisissez une catégorie pour voir les statistiques</p>
+        <h1 class="mb-4">Statistiques - Requêtes Eloquent</h1>
 
-        <div class="row">
-            <!-- Statistiques Générales -->
-            <div class="col-md-4 mb-4">
-                <a href="{{ route('statistics.general') }}" class="text-decoration-none">
-                    <div class="card stat-card bg-primary text-white text-center d-flex justify-content-center align-items-center">
-                        <div class="card-body">
-                            <i class="fas fa-chart-pie stat-icon"></i>
-                            <h4>Statistiques Générales</h4>
-                            <p class="mb-0">Totaux et moyennes</p>
-                        </div>
-                    </div>
+        <!-- Relations -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">Récupérer les relations</div>
+            <div class="card-body">
+                <a href="{{ route('statistics.joueursEquipe', 1) }}" class="btn btn-outline-primary m-1">
+                    Joueurs d'une équipe (id=1)
+                </a>
+                <a href="{{ route('statistics.equipeJoueur', 1) }}" class="btn btn-outline-primary m-1">
+                    Équipe d'un joueur (id=1)
                 </a>
             </div>
+        </div>
 
-            <!-- Top Buteurs -->
-            <div class="col-md-4 mb-4">
-                <a href="{{ route('statistics.topButeurs') }}" class="text-decoration-none">
-                    <div class="card stat-card bg-success text-white text-center d-flex justify-content-center align-items-center">
-                        <div class="card-body">
-                            <i class="fas fa-futbol stat-icon"></i>
-                            <h4>Top Buteurs</h4>
-                            <p class="mb-0">Classement des meilleurs buteurs</p>
-                        </div>
-                    </div>
+        <!-- Filtres simples -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">Filtres simples (where)</div>
+            <div class="card-body">
+                <a href="{{ route('statistics.joueursPlusDe5Buts') }}" class="btn btn-outline-success m-1">
+                    Joueurs > 5 buts
+                </a>
+                <a href="{{ route('statistics.joueursCartesRouges') }}" class="btn btn-outline-success m-1">
+                    Joueurs avec cartes rouges
+                </a>
+                <a href="{{ route('statistics.joueursParPoste', 'Attaquant') }}" class="btn btn-outline-success m-1">
+                    Joueurs Attaquants
                 </a>
             </div>
+        </div>
 
-            <!-- Cartes -->
-            <div class="col-md-4 mb-4">
-                <a href="{{ route('statistics.cartes') }}" class="text-decoration-none">
-                    <div class="card stat-card bg-warning text-dark text-center d-flex justify-content-center align-items-center">
-                        <div class="card-body">
-                            <i class="fas fa-square stat-icon"></i>
-                            <h4>Cartes</h4>
-                            <p class="mb-0">Jaunes et rouges</p>
-                        </div>
-                    </div>
+        <!-- Filtres combinés -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">Filtres combinés (AND / OR)</div>
+            <div class="card-body">
+                <a href="{{ route('statistics.joueurs20a30') }}" class="btn btn-outline-warning m-1">
+                    Joueurs 20-30 ans
+                </a>
+                <a href="{{ route('statistics.joueurs20a30PlusDe10Buts') }}" class="btn btn-outline-warning m-1">
+                    Joueurs 20-30 ans + >10 buts
+                </a>
+                <a href="{{ route('statistics.joueursAttaquantsOuMilieux') }}" class="btn btn-outline-warning m-1">
+                    Attaquants OU Milieux
                 </a>
             </div>
+        </div>
 
-            <!-- Par Équipe -->
-            <div class="col-md-4 mb-4">
-                <a href="{{ route('statistics.parEquipe') }}" class="text-decoration-none">
-                    <div class="card stat-card bg-info text-white text-center d-flex justify-content-center align-items-center">
-                        <div class="card-body">
-                            <i class="fas fa-users stat-icon"></i>
-                            <h4>Par Équipe</h4>
-                            <p class="mb-0">Statistiques détaillées par équipe</p>
-                        </div>
-                    </div>
+        <!-- Tri & Limitation -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">Tri & Limitation</div>
+            <div class="card-body">
+                <a href="{{ route('statistics.joueursTriesParButs') }}" class="btn btn-outline-info m-1">
+                    Joueurs triés par buts
+                </a>
+                <a href="{{ route('statistics.top5Buteurs') }}" class="btn btn-outline-info m-1">
+                    Top 5 buteurs
                 </a>
             </div>
+        </div>
 
-            <!-- Par Poste -->
-            <div class="col-md-4 mb-4">
-                <a href="{{ route('statistics.parPoste') }}" class="text-decoration-none">
-                    <div class="card stat-card bg-secondary text-white text-center d-flex justify-content-center align-items-center">
-                        <div class="card-body">
-                            <i class="fas fa-running stat-icon"></i>
-                            <h4>Par Poste</h4>
-                            <p class="mb-0">Répartition des joueurs</p>
-                        </div>
-                    </div>
+        <!-- Relations avec filtres -->
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">Exploiter les relations (has / whereHas)</div>
+            <div class="card-body">
+                <a href="{{ route('statistics.equipesAvecJoueurs') }}" class="btn btn-outline-secondary m-1">
+                    Équipes avec joueurs
+                </a>
+                <a href="{{ route('statistics.equipesPlusDe5Joueurs') }}" class="btn btn-outline-secondary m-1">
+                    Équipes > 5 joueurs
+                </a>
+                <a href="{{ route('statistics.equipesJoueursMoinsDe20') }}" class="btn btn-outline-secondary m-1">
+                    Équipes avec joueurs < 20 ans
                 </a>
             </div>
+        </div>
 
-            <!-- Joueurs Filtrés -->
-            <div class="col-md-4 mb-4">
-                <a href="{{ route('statistics.joueursFiltres') }}" class="text-decoration-none">
-                    <div class="card stat-card bg-dark text-white text-center d-flex justify-content-center align-items-center">
-                        <div class="card-body">
-                            <i class="fas fa-filter stat-icon"></i>
-                            <h4>Joueurs Filtrés</h4>
-                            <p class="mb-0">where, whereBetween, orWhere</p>
-                        </div>
-                    </div>
+        <!-- Agrégations -->
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">Comptage & Agrégations</div>
+            <div class="card-body">
+                <a href="{{ route('statistics.totalButsParEquipe') }}" class="btn btn-outline-danger m-1">
+                    Total buts par équipe
                 </a>
-            </div>
-
-            <!-- Équipes Filtrées -->
-            <div class="col-md-4 mb-4">
-                <a href="{{ route('statistics.equipesFiltres') }}" class="text-decoration-none">
-                    <div class="card stat-card bg-danger text-white text-center d-flex justify-content-center align-items-center">
-                        <div class="card-body">
-                            <i class="fas fa-layer-group stat-icon"></i>
-                            <h4>Équipes Filtrées</h4>
-                            <p class="mb-0">has, whereHas, with</p>
-                        </div>
-                    </div>
+                <a href="{{ route('statistics.equipesTriesParButs') }}" class="btn btn-outline-danger m-1">
+                    Équipes triées par buts
+                </a>
+                <a href="{{ route('statistics.moyenneAge') }}" class="btn btn-outline-danger m-1">
+                    Moyenne d'âge
+                </a>
+                <a href="{{ route('statistics.topJoueur') }}" class="btn btn-outline-danger m-1">
+                    Joueur avec le + de buts
+                </a>
+                <a href="{{ route('statistics.top3ButeursParEquipe') }}" class="btn btn-outline-danger m-1">
+                    Top 3 buteurs par équipe
                 </a>
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
