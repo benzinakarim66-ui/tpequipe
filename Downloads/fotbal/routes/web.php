@@ -23,3 +23,10 @@ Route::post('/joueurs', [JoueurController::class, 'store'])->name('joueurs.store
 
 // Routes Statistiques
 Route::get('/statistics', [StatisticController::class, 'index'])->name('statistics.index');
+Route::get('/statistics/general', [StatisticController::class, 'general'])->name('statistics.general');
+Route::get('/statistics/top-buteurs', [StatisticController::class, 'topButeurs'])->name('statistics.topButeurs');
+Route::get('/statistics/cartes', [StatisticController::class, 'cartes'])->name('statistics.cartes');
+Route::get('/statistics/par-equipe', [StatisticController::class, 'parEquipe'])->name('statistics.parEquipe');
+Route::get('/statistics/par-poste', [StatisticController::class, 'parPoste'])->name('statistics.parPoste');
+Route::get('/statistics/joueurs-filtres', [StatisticController::class, 'joueursFiltres'])->name('statistics.joueursFiltres');
+Route::get('/statistics/equipes-filtres', [StatisticController::class, 'equipesFiltres'])->name('statistics.equipesFiltres');
